@@ -1,0 +1,52 @@
+version: '3'
+volumes:
+    mysql_data:
+services:
+    empty-project-nginx-service:
+        build:
+            context: .
+            dockerfile: ./nginx/Dockerfile
+        container_name: empty-project-nginx-container
+        volumes:
+            - ./../:/var/www/empty-project/
+        ports: ['8006:80']
+        networks:
+            - empty-project-network
+    empty-project-php-service:
+        build:
+            context: .
+            dockerfile: ./php/Dockerfile
+        container_name: empty-project-php-container
+        ports: ['9007:9000']
+        volumes:
+            - ./../:/var/www/empty-project/
+            - ./../vendor:/var/www/empty-project/vendor
+        networks:
+            - empty-project-network
+    empty-project-mysql-service:
+        image: mysql
+        container_name: empty-project-mysql-container
+        command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--authentication_policy=mysql_native_password']
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+        ports: ['3312:3306']
+        volumes:
+            - ./mysql:/var/lib/mysql
+        networks:
+            - empty-project-network
+    empty-project-phpmyadmin-service:
+        image: phpmyadmin/phpmyadmin:latest
+        container_name: empty-project-phpmyadmin-container
+        environment:
+            PMA_HOST: empty-project-mysql-service
+            PMA_USER: root
+            PMA_PASSWORD: root
+        ports: ['8087:80']
+        depends_on:
+            - empty-project-mysql-service
+        volumes:
+            - ./phpmyadmin/:/var/www/empty-project/docker/phpmyadmin/
+        networks:
+            - empty-project-network
+networks:
+    empty-project-network:
