@@ -8,6 +8,7 @@
 /var/
 /vendor/
 /docker/mysql/
+/public/uploads/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

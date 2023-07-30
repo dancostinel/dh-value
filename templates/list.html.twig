@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% for message in app.flashes('success') %}
+        <div>{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div>{{ message }}</div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+        {{ form_row(form.excel_file) }}
+        <button type="submit">Save</button>
+    {{ form_end(form) }}
+
+    <hr>
+
+    {{ dump(files) }}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">File name</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 1 %}
+            {% for file in files %}
+                <tr>
+                    <th scope="row">{{ i }}</th>
+                    <td>{{ file.filename }}</td>
+                    <td>
+                        <button class="btn">view</button>
+                        <button class="btn">edit</button>
+                        <button class="btn">delete</button>
+                    </td>
+                </tr>
+                {% set i = i + 1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
