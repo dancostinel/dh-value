@@ -7,9 +7,10 @@ namespace App\Controller;
 use App\Form\Type\ExcelUploadType;
 use App\Service\ExcelListService;
 use App\Service\ExcelSaveService;
+use App\Service\ExcelViewService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,5 +43,33 @@ class ExcelController extends AbstractController
             'form' => $form->createView(),
             'files' => $excelListService->getExcelFiles(),
         ]);
+    }
+
+    #[Route('/view', name: 'excel_view_route', options: ['expose' => true], methods: ['GET'])]
+    public function view(
+        Request $request,
+        LoggerInterface $logger,
+        ExcelViewService $excelViewService
+    ): JsonResponse {
+        $excelFileName = $request->query->get('excelFileName');
+        if (empty($excelFileName)) {
+            return new JsonResponse(
+                [
+                    'errors' => [
+                        'status' => '400',
+                        'detail' => 'Invalid request'
+                    ]
+                ],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        try {
+            $excelViewService->view($excelFileName);
+        } catch (\Exception $exception) {
+            $logger->error(__METHOD__.': '.$exception->getMessage());
+        }
+
+        return new JsonResponse(['data' => '']);
     }
 }
